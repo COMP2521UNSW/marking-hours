@@ -1,0 +1,173 @@
+openapi: 3.0.4
+info:
+  title: COMP2521 Marking Hours API
+  description: |-
+    This is the API description for the COMP2521 marking hours app.
+  version: 0.1.0
+
+
+tags:
+  - name: assessments
+    description: Assessments
+  - name: hours
+    description: Marking hours
+paths:
+  /assessments:
+    get:
+      tags:
+        - assessments
+      summary: Get the list of assessments.
+      operationId: getAssessments
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Assessment'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /hours:
+    get:
+      tags:
+        - hours
+      summary: Get marking hours of the logged in user.
+      operationId: getHours
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Entry'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - hours
+      summary: Submit marking hours for an assessment.
+      operationId: postHours
+      requestBody:
+        description: Submit marking hours for an assessment.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewEntry'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: bad request
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /hours/submissions:
+    get:
+      tags:
+        - hours
+      summary: Get all marking hours submissions.
+      operationId: getHoursSubmissions
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Submission'
+        '403':
+          description: unauthorized
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  
+components:
+  schemas:
+    Assessment:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 'ass1'
+        name:
+          type: string
+          example: 'Assignment 1'
+      xml:
+        name: assessment
+    Entry:
+      type: object
+      properties:
+        assessment:
+          $ref: '#/components/schemas/Assessment'
+        hours:
+          type: number
+          example: 3.5
+      xml:
+        name: entry
+    NewEntry:
+      type: object
+      properties:
+        assessmentId:
+          type: string
+          example: 'ass1'
+        hours:
+          type: number
+          example: 3.5
+        note:
+          type: string
+          example: "Marked Nancy's class"
+    Submission:
+      type: object
+      properties:
+        marker:
+          $ref: '#/components/schemas/Marker'
+        assessment:
+          $ref: '#/components/schemas/Assessment'
+        hours:
+          type: number
+          example: 3.5
+        note:
+          type: string
+          example: "Marked Nancy's class"
+        timestamp:
+          type: string
+          format: date-time
+    Marker:
+      type: object
+      properties:
+        zid:
+          type: string
+          example: 'z5123456'
+        name:
+          type: string
+          example: 'Frank Sinatra'
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
